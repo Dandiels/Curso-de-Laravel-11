@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
@@ -34,7 +35,8 @@ class StoreUserRequest extends FormRequest
             [
                 'required',
                 'email',
-                'unique:users,email'
+                // 'unique:users,email',
+                Rule::unique('users', 'email')->ignore($this->user, 'id')
             ],
             'password' =>
             [

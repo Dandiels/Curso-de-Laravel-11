@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends StoreUserRequest
 {
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -15,12 +16,7 @@ class UpdateUserRequest extends StoreUserRequest
     {
         $rules = parent::rules();
 
-        $rules['password'] = [
-            'nullable',
-            'min:6',
-            'max:20',
-        ];
-
+        $rules['password'] = ['nullable', 'min:6', 'max:20'];
         return $rules;
     }
 }
