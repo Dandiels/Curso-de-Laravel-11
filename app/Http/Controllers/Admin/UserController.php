@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\DTO\UserDTO;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
@@ -24,7 +25,8 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        User::create($request->validated());
+        $userDTO = new UserDTO($request->validated('name'), $request->validated('email'), $request->validated('password'));
+        User::create($userDTO->toArray());
         return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso!');
     }
 
@@ -47,13 +49,17 @@ class UserController extends Controller
             return back()->with('message', 'Usuário não encontrado!');
         }
 
-        $data = $request->only('name', 'email');
         if ($request->password)
         {
-            $data['password'] = bcrypt($request->password);
+            $userDTO = new UserDTO($request->validated('name'), $request->validated('email'), $request->validated('password'));
+            $userDTO->password = bcrypt($request->password);
+        }
+        else
+        {
+            $userDTO = new UserDTO($request->validated('name'), $request->validated('email'), null);
         }
 
-        $user->update($data);
+        $user->update($userDTO->toArray());
 
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso!');
     }
@@ -75,7 +81,7 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('message', 'Usuário não encontrado!');
         }
 
-        if (Auth::user()->id === $user->id)
+        if (Auth::id() === $user->id)
         {
             return back()->with('message', 'Você não pode deletar o seu próprio perfil!');
         }
